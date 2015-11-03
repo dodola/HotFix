@@ -1,0 +1,16 @@
+<!--
+  ~ Copyright (C) 2015 Baidu, Inc. All Rights Reserved.
+  -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="dodola.hotfix.MainActivity" >
+    <item android:id="@+id/action_fix"
+          android:title="@string/action_fix"
+          android:orderInCategory="100"
+          app:showAsAction="never" />
+    <item android:id="@+id/action_test"
+          android:title="@string/action_test"
+          android:orderInCategory="100"
+          app:showAsAction="never" />
+</menu >

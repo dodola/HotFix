@@ -1,0 +1,13 @@
+
+apply plugin: 'groovy'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+
+    compile 'org.javassist:javassist:3.18.+'
+}
