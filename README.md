@@ -4,7 +4,7 @@
 ##介绍
 该项目是基于QQ空间终端开发团队的技术文章实现的，完成了文章中提到的基本功能。
 
-文章地址：[安卓App热补丁动态修复技术介绍](http://mp.weixin.qq.com/s?__biz=MzI1MTA1MzM2Nw==&mid=400118620&idx=1&sn=b4fdd5055731290eef12ad0d17f39d4a&scene=0#wechat_redirect)
+文章地址：[安卓App热补丁动态修复技术介绍](http://zhuanlan.zhihu.com/magilu/20308548)
 
 项目部分代码从 [dalvik_patch](https://github.com/simpleton/dalvik_patch) 项目中修改而来，这个项目本来是用来实现multidex的，发现可以用来实现方法替换的效果。
 
@@ -55,7 +55,91 @@ public class BugClass {
 ![](img/patch2.png)
 
 
-###开发Gradle插件实现javassist动态代码注入
+###实现javassist动态代码注入
+
+
+实现这一部分功能的原因主要是因为出现如下异常
+
+`                                                             java.lang.IllegalAccessError: Class ref in pre-verified class resolved to unexpected implementation
+`
+
+问题原因在文档中已经描述的比较清楚。
+
+> 
+就是如果以上方法中直接引用到的类（第一层级关系，不会进行递归搜索）和clazz都在同一个dex中的话，那么这个类就会被打上**CLASS_ISPREVERIFIED**
+
+很明显，解决的方法就是在类中引用一个其他dex中的类，但是源码方式的引用会将引用的类打入同一个dex中，所以我们需要找到一种既能编译通过并且将两个互相引用的类分离到不同的dex中，于是就有了这个动态的代码植入方式。
+
+首先我们需要制作引用类的dex包，代码在`hackdex`中，我直接使用了文档中的类名 `AntilazyLoad` 这样可以和文章中对应起来，方便一些。
+
+我们将这个库打包成dex的jar包，方法跟制作补丁一样。
+
+下面是重点，我们要用`javassist`将这个类在编译打包的过程中插入到目标类中。
+
+为了方便，我将这个过程做成了一个Gradle的Task，代码在`buildSrc`中。
+
+这个项目是使用Groovy开发的，需要配置Groovy SDK才可以编译成功。
+
+核心代码如下：
+
+```groovy
+ /**
+     * 植入代码
+     * @param buildDir 是项目的build class目录,就是我们需要注入的class所在地
+     * @param lib 这个是hackdex的目录,就是AntilazyLoad类的class文件所在地
+     */
+    public static void process(String buildDir, String lib) {
+
+        println(lib)
+        ClassPool classes = ClassPool.getDefault()
+        classes.appendClassPath(buildDir)
+        classes.appendClassPath(lib)
+
+        //下面的操作比较容易理解,在将需要关联的类的构造方法中插入引用代码
+        CtClass c = classes.getCtClass("dodola.hotfix.BugClass")
+        println("====添加构造方法====")
+        def constructor = c.getConstructors()[0];
+        constructor.insertBefore("System.out.println(dodola.hackdex.AntilazyLoad.class);")
+        c.writeFile(buildDir)
+
+
+
+        CtClass c1 = classes.getCtClass("dodola.hotfix.LoadBugClass")
+        println("====添加构造方法====")
+        def constructor1 = c1.getConstructors()[0];
+        constructor1.insertBefore("System.out.println(dodola.hackdex.AntilazyLoad.class);")
+        c1.writeFile(buildDir)
+
+
+        growl("ClassDumper", "${c.frozen}")
+    }
+```
+
+下面在代码编译完成，打包之前，执行植入代码的task就可以了。
+
+在 app 项目的 build.gradle 中插入如下代码
+
+```groovy
+task('processWithJavassist') << {
+    String classPath = file('build/intermediates/classes/debug')//项目编译class所在目录
+    dodola.patch.PatchClass.process(classPath, project(':hackdex').buildDir
+            .absolutePath + '/intermediates/classes/debug')//第二个参数是hackdex的class所在目录
+
+}
+
+android{
+   .......
+    applicationVariants.all { variant ->
+        variant.dex.dependsOn << processWithJavassist //在执行dx命令之前将代码打入到class中
+    }
+}
+
+```
+
+反编译编译后的apk可以发现，代码已经植入进去，而且包里并不存在` dodola.hackdex.AntilazyLoad` 这个类
+
+![](img/patch3.png)
+
 
 ###补丁加载过程分析
 

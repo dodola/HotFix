@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ProjectModuleManager">
-    <modules />
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/HotFix_Git.iml" filepath="$PROJECT_DIR$/HotFix_Git.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/buildSrc/buildSrc.iml" filepath="$PROJECT_DIR$/buildSrc/buildSrc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hackdex/hackdex.iml" filepath="$PROJECT_DIR$/hackdex/hackdex.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hotfixlib/hotfixlib.iml" filepath="$PROJECT_DIR$/hotfixlib/hotfixlib.iml" />
+    </modules>
   </component>
 </project>
