@@ -22,6 +22,9 @@ public class PatchClass {
 
         //下面的操作比较容易理解,在将需要关联的类的构造方法中插入引用代码
         CtClass c = classes.getCtClass("dodola.hotfix.BugClass")
+        if (c.isFrozen()) {
+            c.defrost()
+        }
         println("====添加构造方法====")
         def constructor = c.getConstructors()[0];
         constructor.insertBefore("System.out.println(dodola.hackdex.AntilazyLoad.class);")
@@ -30,13 +33,15 @@ public class PatchClass {
 
 
         CtClass c1 = classes.getCtClass("dodola.hotfix.LoadBugClass")
+        if (c1.isFrozen()) {
+            c1.defrost()
+        }
         println("====添加构造方法====")
         def constructor1 = c1.getConstructors()[0];
         constructor1.insertBefore("System.out.println(dodola.hackdex.AntilazyLoad.class);")
         c1.writeFile(buildDir)
 
 
-        growl("ClassDumper", "${c.frozen}")
     }
 
     static void growl(String title, String message) {
