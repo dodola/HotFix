@@ -4,6 +4,7 @@
 ##介绍
 该项目是基于QQ空间终端开发团队的技术文章实现的，完成了文章中提到的基本功能。
 
+
 文章地址：[安卓App热补丁动态修复技术介绍](http://zhuanlan.zhihu.com/magilu/20308548)
 
 项目部分代码从 [dalvik_patch](https://github.com/simpleton/dalvik_patch) 项目中修改而来，这个项目本来是用来实现multidex的，发现可以用来实现方法替换的效果。
@@ -11,7 +12,8 @@
 项目包括核心类库，补丁制作库，例子。可以直接运行代码看效果。
 
 **文章作者Github:** [jiqimaogou](https://github.com/jiqimaogou)
-希望作者补充一下开发过程中遇到的坑😂
+
+**类似项目:**  [Nuwa](https://github.com/jasonross/Nuwa) 这个项目补丁自动化那块做的很完整，感兴趣的可以去看
 
 
 ##详细说明
@@ -145,6 +147,17 @@ android{
 
 
 ###补丁加载过程分析
+
+##关于混淆
+文档里已经给出了解决方案。
+
+>1. 在正式版本发布的时候，会生成一份缓存文件，里面记录了所有class文件的md5，还有一份mapping混淆文件。
+2. 在后续的版本中使用-applymapping选项，应用正式版本的mapping文件，然后计算编译完成后的class文件的md5和正式版本进行比较，把不相同的class文件打包成补丁包。
+
+
+总的来说就是从有补丁功能的版本开始，保存一份mapping混淆文件，后续编译用同一个混淆mapping文件，这样就能保证混淆过后的类名始终是一致的。
+
+这样打补丁混淆就能完全的自动化了。
 
 
 ##ISSUE
