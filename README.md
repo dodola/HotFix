@@ -1,5 +1,6 @@
 # HotFix（Deprecated）
 
+## 请关注 [RocooFix](https://github.com/dodola/RocooFix)
 我重新写了一个[RocooFix](https://github.com/dodola/RocooFix)框架，解决了Nuwa因为Gradle1.40 里Transform API无法打包的情况，现在兼容Gradle1.3-Gradle2.1.0版本
 
 安卓App热补丁动态修复框架
