@@ -1,3 +1,7 @@
+forked from dodola/HotFix
+https://github.com/dodola/HotFix
+安卓App热补丁动态修复框架
+
 # HotFix（Deprecated）
 
 ## 请关注 [RocooFix](https://github.com/dodola/RocooFix)
